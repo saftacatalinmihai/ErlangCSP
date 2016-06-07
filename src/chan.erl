@@ -10,7 +10,7 @@
 -author("casafta").
 -behavior(gen_server).
 %% API
--export([new/0, new/1, take/1, put/2, test/0]).
+-export([new/0, new/1, take/1, put/2]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
 -record(queue, {
@@ -49,52 +49,6 @@ takeFromQueue(take, State) ->
 takeFromQueue(put, State) ->
   {{value, {PutWaiting, Msg}}, PutQ} = queue:out(State#queue.putQ),
   {{PutWaiting, Msg}, PutQ}.
-
-test() ->
-  C1 = chan:new(),
-  spawn(
-    fun() ->
-      M = chan:take(C1),
-      io:format("Msg recv: ~p~n", [M])
-    end),
-
-  spawn(
-    fun() ->
-      M = chan:take(C1),
-      io:format("Msg recv: ~p~n", [M])
-    end),
-
-  spawn(
-    fun()->
-      chan:put(C1, 1)
-    end),
-
-  spawn(
-    fun()->
-      chan:put(C1, 2)
-    end),
-
-  spawn(
-    fun()->
-      chan:put(C1, 3)
-    end),
-
-  spawn(
-    fun()->
-      chan:put(C1, 4)
-    end),
-
-  spawn(
-    fun() ->
-      M = chan:take(C1),
-      io:format("Msg recv: ~p~n", [M])
-    end),
-
-%%  spawn(
-%%    fun() ->
-      M = chan:take(C1),
-      io:format("Msg recv: ~p~n", [M]).
-%%    end).
 
 new() -> new(1).
 new(BufferSize) ->
